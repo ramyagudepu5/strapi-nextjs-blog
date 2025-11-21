@@ -42,9 +42,9 @@ export default function BlogCard({ post }) {
           {publishedDate && (
             <span className={styles.date}>{formatDate(publishedDate)}</span>
           )}
-          {tags && Array.isArray(tags) && tags.length > 0 && (
+          {normalizeTags(tags).length > 0 && (
             <div className={styles.tags}>
-              {tags.map((tag, index) => (
+              {normalizeTags(tags).map((tag, index) => (
                 <span key={index} className={styles.tag}>{tag}</span>
               ))}
             </div>
@@ -57,3 +57,8 @@ export default function BlogCard({ post }) {
     </div>
   );
 }
+  const normalizeTags = (value) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+    return [];
+  };

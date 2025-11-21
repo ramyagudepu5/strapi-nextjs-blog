@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import sanitizeHtml from 'sanitize-html';
 import { fetchBlogPost, getImageUrl } from '@/lib/api';
 import styles from '@/styles/Post.module.css';
 
@@ -53,11 +54,27 @@ export default function Post() {
     });
   };
 
+  const safeContent = sanitizeHtml(content || '', {
+    allowedTags: sanitizeHtml.defaults.allowedTags,
+    allowedAttributes: {
+      a: ['href', 'name', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'width', 'height'],
+    },
+  });
+
+  const metaDescription = sanitizeHtml(content || '', { allowedTags: [], allowedAttributes: {} }).substring(0, 160);
+
+  const normalizeTags = (value) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+    return [];
+  };
+
   return (
     <>
       <Head>
         <title>{title} - Blog</title>
-        <meta name="description" content={content?.substring(0, 160)} />
+        <meta name="description" content={metaDescription} />
       </Head>
 
       <div className={styles.container}>
@@ -87,9 +104,9 @@ export default function Post() {
               {publishedDate && (
                 <span className={styles.date}>{formatDate(publishedDate)}</span>
               )}
-              {tags && Array.isArray(tags) && tags.length > 0 && (
+              {normalizeTags(tags).length > 0 && (
                 <div className={styles.tags}>
-                  {tags.map((tag, index) => (
+                  {normalizeTags(tags).map((tag, index) => (
                     <span key={index} className={styles.tag}>{tag}</span>
                   ))}
                 </div>
@@ -99,7 +116,7 @@ export default function Post() {
 
           <div 
             className={styles.content}
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: safeContent }}
           />
         </article>
       </div>
