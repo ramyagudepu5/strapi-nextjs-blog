@@ -1,0 +1,25 @@
+{
+  "name": "strapi-blog-platform",
+  "version": "1.0.0",
+  "description": "Full-stack blogging platform with Strapi CMS and Next.js",
+  "private": true,
+  "scripts": {
+    "setup": "node -e \"console.log('Run setup.ps1 (Windows) or setup.sh (Linux/Mac) to configure environment files')\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "npm run develop --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build:frontend": "npm run build --prefix frontend",
+    "start:backend": "npm start --prefix backend",
+    "start:frontend": "npm start --prefix frontend"
+  },
+  "keywords": [
+    "strapi",
+    "nextjs",
+    "blog",
+    "cms",
+    "headless"
+  ],
+  "author": "",
+  "license": "MIT"
+}

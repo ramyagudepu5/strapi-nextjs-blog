@@ -1,0 +1,214 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    STRAPI BLOGGING PLATFORM ARCHITECTURE                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              USER INTERACTIONS                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐                           ┌──────────────────┐
+    │   Admin User     │                           │   End User       │
+    │ (Content Creator)│                           │ (Blog Reader)    │
+    └────────┬─────────┘                           └────────┬─────────┘
+             │                                              │
+             │ Creates/Edits Content                        │ Views Content
+             │                                              │
+             ▼                                              │
+┌────────────────────────────────────────────────────────┐ │
+│         STRAPI ADMIN PANEL                             │ │
+│         http://localhost:1337/admin                    │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  • Login & Authentication                        │ │ │
+│  │  • Content Manager                               │ │ │
+│  │  • Create/Edit/Delete Blog Posts                 │ │ │
+│  │  • Upload Images                                 │ │ │
+│  │  • Manage Categories & Tags                      │ │ │
+│  │  • Publish/Unpublish Posts                       │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+└────────────────────┬───────────────────────────────────┘ │
+                     │                                      │
+                     │ Stores Data                          │
+                     ▼                                      │
+┌────────────────────────────────────────────────────────┐ │
+│              STRAPI BACKEND (Node.js)                  │ │
+│              Port: 1337                                │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  CONTENT TYPE: Blog Post                         │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  • id (Auto-generated)                     │  │ │ │
+│  │  │  • title (String, Required)                │  │ │ │
+│  │  │  • content (Rich Text, Required)           │  │ │ │
+│  │  │  • image (Media Upload)                    │  │ │ │
+│  │  │  • category (String)                       │  │ │ │
+│  │  │  • tags (JSON Array)                       │  │ │ │
+│  │  │  • publishedDate (Date)                    │  │ │ │
+│  │  │  • excerpt (Text)                          │  │ │ │
+│  │  │  • createdAt (Auto)                        │  │ │ │
+│  │  │  • updatedAt (Auto)                        │  │ │ │
+│  │  │  • publishedAt (Auto)                      │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+│                                                        │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  DATABASE: SQLite                                │ │ │
+│  │  Location: backend/.tmp/data.db                  │ │ │
+│  │  (Can be changed to PostgreSQL/MySQL)            │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+└────────────────────┬───────────────────────────────────┘ │
+                     │                                      │
+                     │ Exposes REST API                     │
+                     ▼                                      │
+┌────────────────────────────────────────────────────────┐ │
+│              STRAPI REST API                           │ │
+│              (Auto-generated)                          │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  PUBLIC ENDPOINTS (Read-Only):                   │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  GET  /api/blog-posts?populate=*          │  │ │ │
+│  │  │       → Returns all published posts        │  │ │ │
+│  │  │                                            │  │ │ │
+│  │  │  GET  /api/blog-posts/:id?populate=*      │  │ │ │
+│  │  │       → Returns single post by ID          │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  │                                                   │ │ │
+│  │  ADMIN ENDPOINTS (Authenticated):                │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  POST   /api/blog-posts                   │  │ │ │
+│  │  │  PUT    /api/blog-posts/:id               │  │ │ │
+│  │  │  DELETE /api/blog-posts/:id               │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+└────────────────────┬───────────────────────────────────┘ │
+                     │                                      │
+                     │ HTTP Requests (Axios)                │
+                     │                                      │
+                     ▼                                      │
+┌────────────────────────────────────────────────────────┐ │
+│           NEXT.JS FRONTEND (React)                     │ │
+│           Port: 3000                                   │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  API CLIENT (lib/api.js)                         │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  • fetchBlogPosts()                        │  │ │ │
+│  │  │  • fetchBlogPost(id)                       │  │ │ │
+│  │  │  • getImageUrl(image)                      │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+│                                                        │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  PAGES                                           │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  / (index.js)                              │  │ │ │
+│  │  │  → Blog List Page                          │  │ │ │
+│  │  │  → Displays all posts in grid              │  │ │ │
+│  │  │  → Shows: title, image, excerpt,           │  │ │ │
+│  │  │    category, tags, "Read More"             │  │ │ │
+│  │  │                                            │  │ │ │
+│  │  │  /post/[id] (post/[id].js)                │  │ │ │
+│  │  │  → Single Post Page                        │  │ │ │
+│  │  │  → Dynamic routing                         │  │ │ │
+│  │  │  → Shows: full content, all metadata       │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+│                                                        │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  COMPONENTS                                      │ │ │
+│  │  ┌────────────────────────────────────────────┐  │ │ │
+│  │  │  BlogCard.js                               │  │ │ │
+│  │  │  → Reusable post card component            │  │ │ │
+│  │  │  → Displays post preview                   │  │ │ │
+│  │  └────────────────────────────────────────────┘  │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+│                                                        │ │
+│  ┌──────────────────────────────────────────────────┐ │ │
+│  │  STYLING (CSS Modules)                           │ │ │
+│  │  • globals.css                                   │ │ │
+│  │  • Home.module.css                               │ │ │
+│  │  • Post.module.css                               │ │ │
+│  │  • BlogCard.module.css                           │ │ │
+│  └──────────────────────────────────────────────────┘ │ │
+└────────────────────┬───────────────────────────────────┘ │
+                     │                                      │
+                     │ Renders HTML/CSS                     │
+                     │                                      │
+                     └──────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              DATA FLOW                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CONTENT CREATION FLOW:
+1. Admin logs into Strapi admin panel
+2. Creates blog post with title, content, image, etc.
+3. Saves and publishes the post
+4. Data stored in SQLite database
+5. REST API automatically exposes the content
+
+CONTENT DELIVERY FLOW:
+1. User visits frontend (http://localhost:3000)
+2. Next.js page loads and calls fetchBlogPosts()
+3. Axios makes HTTP GET request to Strapi API
+4. Strapi returns JSON data with blog posts
+5. React components render the data
+6. User sees formatted blog posts in browser
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         TECHNOLOGY STACK                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Backend:
+  • Strapi v4.25.0 (Headless CMS)
+  • Node.js 18+ (Runtime)
+  • SQLite 3.x (Database)
+  • Better-SQLite3 (Database Driver)
+
+Frontend:
+  • Next.js 14.2.0 (React Framework)
+  • React 18.2.0 (UI Library)
+  • Axios 1.6.0 (HTTP Client)
+  • CSS Modules (Styling)
+
+Development:
+  • npm (Package Manager)
+  • Git (Version Control)
+  • VS Code (Recommended IDE)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SECURITY LAYERS                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Authentication
+   └─ Admin panel protected by username/password
+
+2. Authorization
+   └─ Role-based access control (Public vs Admin)
+
+3. API Permissions
+   ├─ Public: Read-only (find, findOne)
+   └─ Admin: Full CRUD access
+
+4. Environment Variables
+   └─ Sensitive data stored in .env files
+
+5. CORS Configuration
+   └─ Controlled cross-origin requests
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         DEPLOYMENT ARCHITECTURE                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Production Setup:
+
+Backend (Strapi):                    Frontend (Next.js):
+  • Railway / Heroku / DO              • Vercel / Netlify
+  • PostgreSQL Database                • CDN Distribution
+  • Environment Variables              • Environment Variables
+  • HTTPS Enabled                      • HTTPS Enabled
+  • Domain: api.yourblog.com           • Domain: yourblog.com
+
+Connection:
+  Frontend → HTTPS → Backend API → Database
+
+═══════════════════════════════════════════════════════════════════════════════
+                              END OF DIAGRAM
+═══════════════════════════════════════════════════════════════════════════════
