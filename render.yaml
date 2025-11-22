@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: strapi-blog-backend
+    env: node
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: strapi-blog-db
+          property: connectionString
+      - key: APP_KEYS
+        generateValue: true
+      - key: API_TOKEN_SALT
+        generateValue: true
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: TRANSFER_TOKEN_SALT
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "https://your-frontend.vercel.app,http://localhost:3000"
+
+databases:
+  - name: strapi-blog-db
+    databaseName: strapi
+    user: strapi
