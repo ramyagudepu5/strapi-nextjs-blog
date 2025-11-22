@@ -26,6 +26,19 @@ services:
       - key: CORS_ORIGINS
         value: "https://your-frontend.vercel.app,http://localhost:3000"
 
+# Database configuration
+databases:
+  - name: strapi-blog-db
+    databaseName: strapi
+    user: strapi
+    plan: free
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: TRANSFER_TOKEN_SALT
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "https://your-frontend.vercel.app,http://localhost:3000"
+
 databases:
   - name: strapi-blog-db
     databaseName: strapi
